@@ -1,8 +1,4 @@
-use std::collections::HashMap;
-use std::fmt;
-use std::io;
-use std::num::ParseFloatError;
-use std::rc::Rc;
+use std::{collections::HashMap, fmt, io, num::ParseFloatError, rc::Rc};
 
 /*
   Types
@@ -27,7 +23,7 @@ struct RispLambda {
 impl fmt::Display for RispExp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let str = match self {
-            RispExp::Bool(a) => a.to_string(),
+            RispExp::Bool(b) => b.to_string(),
             RispExp::Symbol(s) => s.clone(),
             RispExp::Number(n) => n.to_string(),
             RispExp::List(list) => {
@@ -180,7 +176,7 @@ fn default_env<'a>() -> RispEnv<'a> {
 }
 
 fn parse_list_of_floats(args: &[RispExp]) -> Result<Vec<f64>, RispErr> {
-    args.iter().map(|x| parse_single_float(x)).collect()
+    args.iter().map(parse_single_float).collect()
 }
 
 fn parse_single_float(exp: &RispExp) -> Result<f64, RispErr> {
@@ -331,8 +327,7 @@ fn eval(exp: &RispExp, env: &mut RispEnv) -> Result<RispExp, RispErr> {
         RispExp::Symbol(k) => {
             env_get(k, env).ok_or_else(|| RispErr::Reason(format!("unknown symbol k='{}'", k)))
         }
-        RispExp::Bool(_a) => Ok(exp.clone()),
-        RispExp::Number(_a) => Ok(exp.clone()),
+        RispExp::Bool(_) | RispExp::Number(_) => Ok(exp.clone()),
 
         RispExp::List(list) => {
             let first_form = list
